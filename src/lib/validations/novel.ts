@@ -32,7 +32,10 @@ export const createNovelSchema = z.object({
     .optional(),
 });
 
-export const updateNovelSchema = createNovelSchema.partial();
+export const updateNovelSchema = createNovelSchema.partial().extend({
+  // Saat update, user boleh mengosongkan seluruh genre (boleh array kosong)
+  genreIds: z.array(z.number().int().positive()).optional(),
+});
 
 export type CreateNovelInput = z.infer<typeof createNovelSchema>;
 export type UpdateNovelInput = z.infer<typeof updateNovelSchema>;

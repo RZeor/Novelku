@@ -55,15 +55,11 @@ export async function GET(_request: NextRequest, { params }: Params) {
 
     if (!novel) return notFoundResponse('Novel tidak ditemukan');
 
-    // Increment view count
-    await prisma.novel.update({
-      where: { id: novelId },
-      data: { viewCount: { increment: 1 } },
-    });
+    // View count hanya ditambah saat chapter benar-benar dibaca
+    // (lihat POST /api/chapters/:id/history) untuk menghindari double count.
 
     const formattedNovel = {
       ...novel,
-      viewCount: novel.viewCount + 1,
       genres: novel.genres.map((ng) => ng.genre),
     };
 
@@ -99,7 +95,14 @@ export async function PUT(request: NextRequest, { params }: Params) {
     const updateData: Record<string, unknown> = {};
     if (title !== undefined) {
       updateData.title = title;
-      updateData.slug = generateSlug(title);
+
+      // Generate slug unik — pastikan tidak bentrok dengan novel lain
+      let slug = generateSlug(title);
+      const slugOwner = await prisma.novel.findUnique({ where: { slug } });
+      if (slugOwner && slugOwner.id !== novelId) {
+        slug = `${slug}-${Date.now()}`;
+      }
+      updateData.slug = slug;
     }
     if (description !== undefined) updateData.description = description;
     if (author !== undefined) updateData.author = author;
@@ -108,6 +111,17 @@ export async function PUT(request: NextRequest, { params }: Params) {
 
     // Handle genre update
     if (genreIds !== undefined) {
+      // Validasi seluruh genreId benar-benar ada
+      if (genreIds.length > 0) {
+        const existingGenres = await prisma.genre.findMany({
+          where: { id: { in: genreIds } },
+          select: { id: true },
+        });
+        if (existingGenres.length !== genreIds.length) {
+          return errorResponse('Satu atau lebih genre tidak ditemukan', 400);
+        }
+      }
+
       // Delete old genre relations and create new ones
       await prisma.novelGenre.deleteMany({ where: { novelId } });
       if (genreIds.length > 0) {

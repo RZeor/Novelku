@@ -42,6 +42,12 @@ export async function GET(_request: NextRequest, { params }: Params) {
 
     if (!chapter) return notFoundResponse('Chapter tidak ditemukan');
 
+    // Catat view novel setiap kali chapter dibuka (semua pengunjung)
+    await prisma.novel.update({
+      where: { id: chapter.novelId },
+      data: { viewCount: { increment: 1 } },
+    });
+
     return successResponse(chapter);
   } catch (error) {
     console.error('Get chapter error:', error);

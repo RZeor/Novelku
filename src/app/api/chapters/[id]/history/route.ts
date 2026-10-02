@@ -52,12 +52,7 @@ export async function POST(_request: NextRequest, { params }: Params) {
       },
     });
 
-    // Also increment novel view count
-    await prisma.novel.update({
-      where: { id: chapter.novelId },
-      data: { viewCount: { increment: 1 } },
-    });
-
+    // View count sudah dicatat oleh GET /api/chapters/:id saat chapter dibuka.
     return successResponse(history);
   } catch (error) {
     console.error('Record reading history error:', error);

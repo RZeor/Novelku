@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/context/auth-context';
 import { bookmarkApi, ApiError } from '@/lib/api-client';
 import { BookmarkResponse, PaginationMeta } from '@/types';
+import { formatImageUrl } from '@/lib/utils';
 import Pagination from '@/components/pagination';
 import {
   Bookmark,
@@ -166,7 +167,7 @@ function BookmarksContent() {
               >
                 {b.novel?.coverImage ? (
                   <img
-                    src={b.novel.coverImage}
+                    src={formatImageUrl(b.novel.coverImage)}
                     alt={b.novel.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
@@ -190,7 +191,7 @@ function BookmarksContent() {
                     Oleh {b.novel?.author || '-'}
                   </p>
                   <div className="flex items-center gap-2 mt-2 text-[11px] text-zinc-400">
-                    <span>{b.novel?.totalChapters || 0} Bab</span>
+                    <span>{b.novel?.totalChapters || 0} Chapter</span>
                     <span>•</span>
                     <span className="text-amber-500 font-semibold">
                       ★ {Number(b.novel?.averageRating || 0).toFixed(1)}

@@ -12,7 +12,7 @@ import {
 
 type Params = { params: Promise<{ id: string }> };
 
-// Helper to recalculate average rating
+// Helper to recalculate average rating. Returns the fresh aggregate values.
 async function recalculateRating(novelId: number) {
   const result = await prisma.rating.aggregate({
     where: { novelId },
@@ -20,13 +20,17 @@ async function recalculateRating(novelId: number) {
     _count: { value: true },
   });
 
+  const averageRating = result._avg.value
+    ? parseFloat(result._avg.value.toFixed(2))
+    : 0;
+  const ratingCount = result._count.value;
+
   await prisma.novel.update({
     where: { id: novelId },
-    data: {
-      averageRating: result._avg.value ? parseFloat(result._avg.value.toFixed(2)) : 0,
-      ratingCount: result._count.value,
-    },
+    data: { averageRating, ratingCount },
   });
+
+  return { averageRating, ratingCount };
 }
 
 // POST /api/novels/:id/rating — Create rating
@@ -61,9 +65,14 @@ export async function POST(request: NextRequest, { params }: Params) {
         select: { id: true, userId: true, novelId: true, value: true, createdAt: true, updatedAt: true },
       });
 
-      await recalculateRating(novelId);
+      const fresh = await recalculateRating(novelId);
 
-      return successResponse({ ...rating, message: 'Rating berhasil diupdate' });
+      return successResponse({
+        ...rating,
+        averageRating: fresh.averageRating,
+        ratingCount: fresh.ratingCount,
+        message: 'Rating berhasil diupdate',
+      });
     }
 
     // Create new rating
@@ -76,9 +85,13 @@ export async function POST(request: NextRequest, { params }: Params) {
       select: { id: true, userId: true, novelId: true, value: true, createdAt: true, updatedAt: true },
     });
 
-    await recalculateRating(novelId);
+    const fresh = await recalculateRating(novelId);
 
-    return createdResponse(rating);
+    return createdResponse({
+      ...rating,
+      averageRating: fresh.averageRating,
+      ratingCount: fresh.ratingCount,
+    });
   } catch (error) {
     console.error('Create/update rating error:', error);
     return serverErrorResponse('Gagal memberi rating');

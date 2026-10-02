@@ -68,7 +68,7 @@ export default function AdminChaptersPage({ params }: AdminChaptersPageProps) {
       : 1;
 
     setChapterNumber(nextNumber);
-    setChapterTitle(`Bab ${nextNumber}: `);
+    setChapterTitle(`Chapter ${nextNumber}: `);
     setContentType('upload');
     setSelectedFile(null);
     setManualContent('');
@@ -84,7 +84,7 @@ export default function AdminChaptersPage({ params }: AdminChaptersPageProps) {
     setSelectedFile(null);
     setFormError(null);
 
-    // Ambil isi teks bab eksisting
+    // Ambil isi teks chapter eksisting
     try {
       const detail = await chapterApi.get(chapter.id);
       setManualContent(detail.content);
@@ -196,7 +196,7 @@ export default function AdminChaptersPage({ params }: AdminChaptersPageProps) {
   };
 
   const handleDelete = async (id: number, number: number, title: string) => {
-    if (!confirm(`Apakah Anda yakin ingin menghapus Bab ${number}: "${title}"?`)) {
+    if (!confirm(`Apakah Anda yakin ingin menghapus Chapter ${number}: "${title}"?`)) {
       return;
     }
 
@@ -243,13 +243,13 @@ export default function AdminChaptersPage({ params }: AdminChaptersPageProps) {
       <div className="bg-white dark:bg-zinc-900 rounded-3xl p-6 border border-zinc-200/80 dark:border-zinc-800 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <span className="text-[10px] uppercase font-bold tracking-wider text-indigo-600 dark:text-indigo-400">
-            Manajemen Bab Cerita
+            Manajemen Chapter Cerita
           </span>
           <h1 className="text-2xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-50 mt-0.5">
             {novel.title}
           </h1>
           <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
-            Penulis: {novel.author} • Total {novel.chapters.length} Bab dipublikasikan
+            Penulis: {novel.author} • Total {novel.chapters.length} Chapter dipublikasikan
           </p>
         </div>
 
@@ -268,8 +268,8 @@ export default function AdminChaptersPage({ params }: AdminChaptersPageProps) {
           <table className="w-full text-left text-xs text-zinc-600 dark:text-zinc-300">
             <thead className="bg-zinc-50 dark:bg-zinc-800/60 text-zinc-500 dark:text-zinc-400 font-semibold border-b border-zinc-100 dark:border-zinc-800 uppercase tracking-wider text-[10px]">
               <tr>
-                <th className="py-3 px-6">Bab #</th>
-                <th className="py-3 px-6">Judul Bab</th>
+                <th className="py-3 px-6">Chapter #</th>
+                <th className="py-3 px-6">Judul Chapter</th>
                 <th className="py-3 px-6 text-center">Jumlah Kata</th>
                 <th className="py-3 px-6">Tanggal Rilis</th>
                 <th className="py-3 px-6 text-right">Aksi</th>
@@ -286,7 +286,7 @@ export default function AdminChaptersPage({ params }: AdminChaptersPageProps) {
                 novel.chapters.map((ch) => (
                   <tr key={ch.id} className="hover:bg-zinc-50/60 dark:hover:bg-zinc-800/40 transition-colors">
                     <td className="py-3.5 px-6 font-bold text-zinc-900 dark:text-zinc-100">
-                      Bab {ch.chapterNumber}
+                      Chapter {ch.chapterNumber}
                     </td>
                     <td className="py-3.5 px-6 font-semibold text-zinc-900 dark:text-zinc-100">
                       <Link
@@ -361,7 +361,7 @@ export default function AdminChaptersPage({ params }: AdminChaptersPageProps) {
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
                   <label className="block font-semibold text-zinc-700 dark:text-zinc-300 mb-1">
-                    Nomor Bab *
+                    Nomor Chapter *
                   </label>
                   <input
                     type="number"
@@ -375,14 +375,14 @@ export default function AdminChaptersPage({ params }: AdminChaptersPageProps) {
 
                 <div className="sm:col-span-2">
                   <label className="block font-semibold text-zinc-700 dark:text-zinc-300 mb-1">
-                    Judul Bab *
+                    Judul Chapter *
                   </label>
                   <input
                     type="text"
                     required
                     value={chapterTitle}
                     onChange={(e) => setChapterTitle(e.target.value)}
-                    placeholder="Contoh: Bab 1: Awal Mula"
+                    placeholder="Contoh: Chapter 1: Awal Mula"
                     className="w-full p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800/60 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   />
                 </div>
@@ -469,7 +469,7 @@ export default function AdminChaptersPage({ params }: AdminChaptersPageProps) {
                     required={contentType === 'manual'}
                     value={manualContent}
                     onChange={(e) => setManualContent(e.target.value)}
-                    placeholder="Ketik atau tempel teks bab novel di sini..."
+                    placeholder="Ketik atau tempel teks chapter novel di sini..."
                     className="w-full p-3 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800/60 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-serif leading-relaxed"
                   />
                   <span className="text-[11px] text-zinc-400">

@@ -259,7 +259,7 @@ export default function NovelDetailPage({ params }: NovelDetailProps) {
                   </p>
                 </div>
                 <div className="text-center sm:text-left">
-                  <p className="text-[11px] text-zinc-400 font-medium">Total Bab</p>
+                  <p className="text-[11px] text-zinc-400 font-medium">Total Chapter</p>
                   <p className="text-base sm:text-lg font-bold text-zinc-900 dark:text-zinc-100 flex items-center justify-center sm:justify-start gap-1">
                     <BookOpen className="w-4 h-4 text-indigo-500" />
                     <span>{novel.totalChapters}</span>
@@ -293,7 +293,7 @@ export default function NovelDetailPage({ params }: NovelDetailProps) {
                   className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold shadow-md shadow-indigo-600/20 transition-colors"
                 >
                   <BookOpen className="w-4 h-4" />
-                  <span>Mulai Baca (Bab 1)</span>
+                  <span>Mulai Baca (Chapter 1)</span>
                 </Link>
               ) : (
                 <button
@@ -354,7 +354,7 @@ export default function NovelDetailPage({ params }: NovelDetailProps) {
               Daftar Chapter ({novel.chapters.length})
             </h2>
             <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
-              Pilih bab untuk mulai membaca
+              Pilih chapter untuk mulai membaca
             </p>
           </div>
 
@@ -366,7 +366,7 @@ export default function NovelDetailPage({ params }: NovelDetailProps) {
                 type="text"
                 value={chapterSearch}
                 onChange={(e) => setChapterSearch(e.target.value)}
-                placeholder="Cari nomor / judul bab..."
+                placeholder="Cari nomor / judul chapter..."
                 className="w-full pl-9 pr-3 py-1.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800/60 text-xs text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
             </div>
@@ -391,7 +391,7 @@ export default function NovelDetailPage({ params }: NovelDetailProps) {
               >
                 <div className="min-w-0 pr-2">
                   <p className="text-xs font-semibold text-zinc-900 dark:text-zinc-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 truncate">
-                    Bab {ch.chapterNumber}: {ch.title}
+                    Chapter {ch.chapterNumber}: {ch.title}
                   </p>
                   <p className="text-[11px] text-zinc-400 mt-0.5">
                     {ch.wordCount.toLocaleString()} kata •{' '}

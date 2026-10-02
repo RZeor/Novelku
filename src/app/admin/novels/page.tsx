@@ -223,7 +223,7 @@ export default function AdminNovelsPage() {
                 <th className="py-3 px-4">Penulis</th>
                 <th className="py-3 px-4">Genre</th>
                 <th className="py-3 px-4">Status</th>
-                <th className="py-3 px-4 text-center">Bab</th>
+                <th className="py-3 px-4 text-center">Chapter</th>
                 <th className="py-3 px-4 text-center">Dilihat</th>
                 <th className="py-3 px-4 text-center">Rating</th>
                 <th className="py-3 px-4 text-right">Aksi</th>
@@ -252,7 +252,7 @@ export default function AdminNovelsPage() {
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-14 rounded-lg bg-zinc-100 dark:bg-zinc-800 overflow-hidden shrink-0">
                           {novel.coverImage ? (
-                            <img src={novel.coverImage} alt={novel.title} className="w-full h-full object-cover" />
+                            <img src={formatImageUrl(novel.coverImage)} alt={novel.title} className="w-full h-full object-cover" />
                           ) : (
                             <div className="w-full h-full flex items-center justify-center text-zinc-400">
                               <BookOpen className="w-4 h-4" />
@@ -305,7 +305,7 @@ export default function AdminNovelsPage() {
                       </span>
                     </td>
 
-                    {/* Bab */}
+                    {/* Chapter */}
                     <td className="py-3 px-4 text-center font-bold text-zinc-900 dark:text-zinc-100">
                       {novel.totalChapters}
                     </td>

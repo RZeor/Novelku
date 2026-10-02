@@ -95,7 +95,7 @@ export default function NovelCard({ novel }: NovelCardProps) {
         <div className="mt-3 pt-3 border-t border-zinc-100 dark:border-zinc-800/80 flex items-center justify-between text-[11px] text-zinc-500 dark:text-zinc-400">
           <span className="flex items-center gap-1">
             <BookOpen className="w-3 h-3 text-zinc-400" />
-            <span>{novel.totalChapters} Bab</span>
+            <span>{novel.totalChapters} Chapter</span>
           </span>
           <span className="flex items-center gap-1">
             <Eye className="w-3 h-3 text-zinc-400" />

@@ -57,6 +57,21 @@ export interface NovelListResponse {
   createdAt: Date;
 }
 
+/** Ringkasan chapter terbaru untuk kartu Novel Update */
+export interface NovelUpdateChapter {
+  id: number;
+  chapterNumber: number;
+  title: string;
+  createdAt: Date;
+}
+
+/** Novel yang baru mendapat update chapter (untuk homepage) */
+export interface UpdatedNovelResponse extends NovelListResponse {
+  lastChapterNumber: number | null;
+  lastUpdatedAt: Date | null;
+  recentChapters: NovelUpdateChapter[];
+}
+
 // ============================================================
 // Genre Types
 // ============================================================
@@ -125,6 +140,8 @@ export interface RatingResponse {
   value: number;
   createdAt: Date;
   updatedAt: Date;
+  averageRating?: number;
+  ratingCount?: number;
 }
 
 export interface BookmarkResponse {

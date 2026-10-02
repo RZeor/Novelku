@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/context/auth-context';
 import { historyApi } from '@/lib/api-client';
 import { ReadingHistoryResponse, PaginationMeta } from '@/types';
+import { formatImageUrl } from '@/lib/utils';
 import Pagination from '@/components/pagination';
 import {
   History,
@@ -93,7 +94,7 @@ function HistoryContent() {
             Riwayat Membaca ({pagination.total})
           </h1>
           <p className="text-sm text-zinc-600 dark:text-zinc-400 mt-1">
-            Bab-bab yang baru saja Anda buka dan baca
+            Chapter-chapter yang baru saja Anda buka dan baca
           </p>
         </div>
 
@@ -129,7 +130,7 @@ function HistoryContent() {
             Belum ada riwayat membaca
           </h3>
           <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 mb-6">
-            Mulai membaca salah satu novel favorit Anda sekarang, dan bab terakhir akan tersimpan otomatis di sini.
+            Mulai membaca salah satu novel favorit Anda sekarang, dan chapter terakhir akan tersimpan otomatis di sini.
           </p>
           <Link
             href="/novels"
@@ -151,7 +152,7 @@ function HistoryContent() {
                 <div className="w-14 h-18 rounded-xl bg-zinc-100 dark:bg-zinc-800 overflow-hidden shrink-0">
                   {h.novel?.coverImage ? (
                     <img
-                      src={h.novel.coverImage}
+                      src={formatImageUrl(h.novel.coverImage)}
                       alt={h.novel.title}
                       className="w-full h-full object-cover"
                     />
@@ -170,7 +171,7 @@ function HistoryContent() {
                     {h.novel?.title || 'Novel'}
                   </Link>
                   <p className="text-xs font-medium text-indigo-600 dark:text-indigo-400 mt-0.5">
-                    Bab {h.chapter?.chapterNumber}: {h.chapter?.title}
+                    Chapter {h.chapter?.chapterNumber}: {h.chapter?.title}
                   </p>
                   <p className="text-[11px] text-zinc-400 flex items-center gap-1 mt-1.5">
                     <Clock className="w-3 h-3" />

@@ -92,7 +92,7 @@ export default function ReaderPage({ params }: ReaderPageProps) {
     localStorage.setItem('novelku_reader_width', newWidth);
   };
 
-  // 2. Muat data chapter dan daftar bab
+  // 2. Muat data chapter dan daftar chapter
   useEffect(() => {
     async function loadChapterData() {
       if (isNaN(chapterId)) {
@@ -108,10 +108,10 @@ export default function ReaderPage({ params }: ReaderPageProps) {
         const chapterData = await chapterApi.get(chapterId);
         setChapter(chapterData);
         if (typeof document !== 'undefined') {
-          document.title = `Bab ${chapterData.chapterNumber}: ${chapterData.title} — ${chapterData.novel.title} | Novelku`;
+          document.title = `Chapter ${chapterData.chapterNumber}: ${chapterData.title} — ${chapterData.novel.title} | Novelku`;
         }
 
-        // Ambil seluruh daftar bab dari novel ini untuk navigasi
+        // Ambil seluruh daftar chapter dari novel ini untuk navigasi
         const chaptersList = await chapterApi.listByNovel(chapterData.novelId);
         setAllChapters(chaptersList);
 
@@ -140,7 +140,7 @@ export default function ReaderPage({ params }: ReaderPageProps) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-zinc-50 dark:bg-zinc-950">
         <Loader2 className="w-8 h-8 animate-spin text-indigo-600 mb-3" />
-        <p className="text-sm text-zinc-500 font-medium">Menyiapkan bab bacaan...</p>
+        <p className="text-sm text-zinc-500 font-medium">Menyiapkan chapter bacaan...</p>
       </div>
     );
   }
@@ -153,7 +153,7 @@ export default function ReaderPage({ params }: ReaderPageProps) {
           {error || 'Chapter tidak ditemukan'}
         </h1>
         <p className="text-sm text-zinc-500 mt-2 mb-6">
-          Bab novel yang Anda cari mungkin telah dihapus.
+          Chapter yang Anda cari mungkin telah dihapus.
         </p>
         <Link
           href="/novels"
@@ -228,18 +228,18 @@ export default function ReaderPage({ params }: ReaderPageProps) {
         {/* Tengah: Nomor & Judul Chapter */}
         <div className="text-center px-2 min-w-0">
           <p className="text-xs font-bold truncate max-w-[200px] sm:max-w-md">
-            Bab {chapter.chapterNumber}: {chapter.title}
+            Chapter {chapter.chapterNumber}: {chapter.title}
           </p>
         </div>
 
-        {/* Kanan: Tombol Pengaturan & Daftar Bab */}
+        {/* Kanan: Tombol Pengaturan & Daftar Chapter */}
         <div className="flex items-center gap-1">
-          {/* Tombol Daftar Bab */}
+          {/* Tombol Daftar Chapter */}
           <button
             onClick={() => setIsChapterDrawerOpen(true)}
             className="p-2 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
-            title="Daftar Bab"
-            aria-label="Buka daftar bab"
+            title="Daftar Chapter"
+            aria-label="Buka daftar chapter"
           >
             <List className="w-4 h-4" />
           </button>
@@ -422,7 +422,7 @@ export default function ReaderPage({ params }: ReaderPageProps) {
                   }`}
                 >
                   <span className="truncate pr-2">
-                    Bab {ch.chapterNumber}: {ch.title}
+                    Chapter {ch.chapterNumber}: {ch.title}
                   </span>
                   <span className="text-[10px] opacity-75 shrink-0">
                     {ch.wordCount.toLocaleString()} kata
@@ -436,10 +436,10 @@ export default function ReaderPage({ params }: ReaderPageProps) {
 
       {/* 2. KONTEN MEMBACA UTAMA */}
       <main className={`flex-1 mx-auto px-4 sm:px-8 py-10 sm:py-16 pb-28 sm:pb-16 w-full ${readerWidth}`}>
-        {/* Header Bab */}
+        {/* Header Chapter */}
         <div className="text-center mb-10 pb-6 border-b border-current/10">
           <p className="text-xs font-bold uppercase tracking-widest opacity-60 mb-2">
-            Bab {chapter.chapterNumber}
+            Chapter {chapter.chapterNumber}
           </p>
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight mb-3">
             {chapter.title}
@@ -449,7 +449,7 @@ export default function ReaderPage({ params }: ReaderPageProps) {
           </p>
         </div>
 
-        {/* Teks Isi Bab & Ilustrasi */}
+        {/* Teks Isi Chapter & Ilustrasi */}
         <article
           className={`space-y-6 ${fontSizeClasses[fontSize]} ${lineHeightClasses[lineHeight]} font-serif tracking-normal`}
         >
@@ -517,7 +517,7 @@ export default function ReaderPage({ params }: ReaderPageProps) {
               className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-current/20 hover:bg-current/5 text-xs font-bold transition-all"
             >
               <ChevronLeft className="w-4 h-4" />
-              <span>Bab Sebelumnya</span>
+              <span>Chapter Sebelumnya</span>
             </Link>
           ) : (
             <button
@@ -525,7 +525,7 @@ export default function ReaderPage({ params }: ReaderPageProps) {
               className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-current/10 opacity-30 text-xs font-bold cursor-not-allowed"
             >
               <ChevronLeft className="w-4 h-4" />
-              <span>Bab Sebelumnya</span>
+              <span>Chapter Sebelumnya</span>
             </button>
           )}
 
@@ -534,7 +534,7 @@ export default function ReaderPage({ params }: ReaderPageProps) {
             className="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold opacity-70 hover:opacity-100 transition-opacity"
           >
             <List className="w-4 h-4" />
-            <span>Pilih Bab</span>
+            <span>Pilih Chapter</span>
           </button>
 
           {nextChapter ? (
@@ -542,7 +542,7 @@ export default function ReaderPage({ params }: ReaderPageProps) {
               href={`/chapters/${nextChapter.id}`}
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold shadow-md shadow-indigo-600/20 transition-all"
             >
-              <span>Bab Selanjutnya</span>
+              <span>Chapter Selanjutnya</span>
               <ChevronRight className="w-4 h-4" />
             </Link>
           ) : (
@@ -550,7 +550,7 @@ export default function ReaderPage({ params }: ReaderPageProps) {
               disabled
               className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-current/10 opacity-30 text-xs font-bold cursor-not-allowed"
             >
-              <span>Bab Terakhir</span>
+              <span>Chapter Terakhir</span>
               <ChevronRight className="w-4 h-4" />
             </button>
           )}
@@ -566,7 +566,7 @@ export default function ReaderPage({ params }: ReaderPageProps) {
           <Link
             href={`/chapters/${prevChapter.id}`}
             className="p-2 rounded-xl hover:bg-current/10 transition-colors flex flex-col items-center gap-0.5 text-[10px] font-semibold"
-            aria-label="Bab Sebelumnya"
+            aria-label="Chapter Sebelumnya"
           >
             <ChevronLeft className="w-5 h-5" />
             <span>Sebelumnya</span>
@@ -584,10 +584,10 @@ export default function ReaderPage({ params }: ReaderPageProps) {
         <button
           onClick={() => setIsChapterDrawerOpen(true)}
           className="p-2 rounded-xl hover:bg-current/10 transition-colors flex flex-col items-center gap-0.5 text-[10px] font-semibold"
-          aria-label="Buka daftar bab"
+          aria-label="Buka daftar chapter"
         >
           <List className="w-5 h-5" />
-          <span>Daftar Bab</span>
+          <span>Daftar Chapter</span>
         </button>
 
         <button
@@ -603,7 +603,7 @@ export default function ReaderPage({ params }: ReaderPageProps) {
           <Link
             href={`/chapters/${nextChapter.id}`}
             className="p-2 rounded-xl hover:bg-current/10 transition-colors flex flex-col items-center gap-0.5 text-[10px] font-semibold text-indigo-600 dark:text-indigo-400"
-            aria-label="Bab Selanjutnya"
+            aria-label="Chapter Selanjutnya"
           >
             <ChevronRight className="w-5 h-5" />
             <span>Selanjutnya</span>

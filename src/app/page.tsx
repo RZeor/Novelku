@@ -5,8 +5,15 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/auth-context';
 import { novelApi, genreApi, historyApi } from '@/lib/api-client';
-import { NovelListResponse, GenreResponse, ReadingHistoryResponse } from '@/types';
+import {
+  NovelListResponse,
+  UpdatedNovelResponse,
+  GenreResponse,
+  ReadingHistoryResponse,
+} from '@/types';
 import NovelCard from '@/components/novel-card';
+import NovelUpdateCard from '@/components/novel-update-card';
+import { formatImageUrl } from '@/lib/utils';
 import {
   BookOpen,
   Search,
@@ -16,6 +23,7 @@ import {
   ArrowRight,
   Clock,
   ChevronRight,
+  RefreshCw,
 } from 'lucide-react';
 
 export default function HomePage() {
@@ -24,6 +32,7 @@ export default function HomePage() {
 
   const [searchQuery, setSearchQuery] = useState('');
   const [latestNovels, setLatestNovels] = useState<NovelListResponse[]>([]);
+  const [updatedNovels, setUpdatedNovels] = useState<UpdatedNovelResponse[]>([]);
   const [popularNovels, setPopularNovels] = useState<NovelListResponse[]>([]);
   const [genres, setGenres] = useState<GenreResponse[]>([]);
   const [recentHistory, setRecentHistory] = useState<ReadingHistoryResponse[]>([]);
@@ -33,13 +42,15 @@ export default function HomePage() {
     async function loadHomeData() {
       setIsLoading(true);
       try {
-        const [latestRes, popularRes, genresRes] = await Promise.all([
+        const [latestRes, updatesRes, popularRes, genresRes] = await Promise.all([
           novelApi.list({ sortBy: 'createdAt', sortOrder: 'desc', limit: 8 }),
+          novelApi.updates(8),
           novelApi.list({ sortBy: 'viewCount', sortOrder: 'desc', limit: 4 }),
           genreApi.list(),
         ]);
 
         setLatestNovels(latestRes.items);
+        setUpdatedNovels(updatesRes);
         setPopularNovels(popularRes.items);
         setGenres(genresRes);
 
@@ -156,7 +167,7 @@ export default function HomePage() {
               </Link>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-4 lg:grid-cols-5 gap-4">
               {recentHistory.map((item) => (
                 <div
                   key={item.id}
@@ -165,7 +176,7 @@ export default function HomePage() {
                   <div className="w-12 h-16 rounded-lg bg-zinc-100 dark:bg-zinc-800 overflow-hidden shrink-0">
                     {item.novel?.coverImage ? (
                       <img
-                        src={item.novel.coverImage}
+                        src={formatImageUrl(item.novel.coverImage)}
                         alt={item.novel.title}
                         className="w-full h-full object-cover"
                       />
@@ -180,7 +191,7 @@ export default function HomePage() {
                       {item.novel?.title || 'Novel'}
                     </h3>
                     <p className="text-xs text-indigo-600 dark:text-indigo-400 font-medium mt-0.5">
-                      Bab {item.chapter?.chapterNumber}: {item.chapter?.title}
+                      Chapter {item.chapter?.chapterNumber}: {item.chapter?.title}
                     </p>
                     <Link
                       href={`/chapters/${item.chapterId}`}
@@ -215,7 +226,7 @@ export default function HomePage() {
           </div>
 
           {isLoading ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6">
               {[...Array(8)].map((_, i) => (
                 <div
                   key={i}
@@ -237,7 +248,7 @@ export default function HomePage() {
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6">
               {latestNovels.map((novel) => (
                 <NovelCard key={novel.id} novel={novel} />
               ))}
@@ -264,7 +275,7 @@ export default function HomePage() {
               </Link>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6">
               {popularNovels.map((novel) => (
                 <NovelCard key={novel.id} novel={novel} />
               ))}
@@ -272,7 +283,34 @@ export default function HomePage() {
           </section>
         )}
 
-        {/* 5. SECTION JELAJAH GENRE */}
+        {/* 5. SECTION NOVEL UPDATE (hanya novel yang baru dapat chapter baru) */}
+        {updatedNovels.length > 0 && (
+          <section>
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-2">
+                <RefreshCw className="w-5 h-5 text-amber-500" />
+                <h2 className="text-xl sm:text-2xl font-bold text-zinc-900 dark:text-zinc-100">
+                  Novel Update
+                </h2>
+              </div>
+              <Link
+                href="/novels"
+                className="text-sm font-semibold text-amber-600 dark:text-amber-400 hover:underline flex items-center gap-1"
+              >
+                <span>Lihat Semua</span>
+                <ChevronRight className="w-4 h-4" />
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-4 lg:grid-cols-5 xl:grid-cols-4 gap-4 sm:gap-6">
+              {updatedNovels.map((novel) => (
+                <NovelUpdateCard key={novel.id} novel={novel} />
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* 6. SECTION JELAJAH GENRE */}
         {genres.length > 0 && (
           <section className="pt-6 border-t border-zinc-200/80 dark:border-zinc-800">
             <div className="flex items-center gap-2 mb-6">

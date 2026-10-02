@@ -56,6 +56,35 @@ export function buildPaginationMeta(
 }
 
 /**
+ * Format a date/timestamp into Indonesian relative time.
+ * Example: "10 jam", "7 hari", "2 minggu".
+ * Returns "Baru" when the timestamp is in the future or invalid.
+ */
+export function formatRelativeTime(date: Date | string | number): string {
+  const target = new Date(date).getTime();
+  if (Number.isNaN(target)) return '';
+
+  const seconds = Math.floor((Date.now() - target) / 1000);
+  if (seconds < 60) return 'Baru';
+
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes} menit`;
+
+  const hours = Math.floor(seconds / 3600);
+  if (hours < 24) return `${hours} jam`;
+
+  const days = Math.floor(seconds / 86400);
+  if (days < 14) return `${days} hari`;
+
+  if (days < 60) return `${Math.floor(days / 7)} minggu`;
+
+  const months = Math.floor(days / 30);
+  if (months < 12) return `${months} bulan`;
+
+  return `${Math.floor(days / 365)} tahun`;
+}
+
+/**
  * Format image URL.
  * Automatically converts Google Drive share links to direct high-speed CDN image URLs.
  */

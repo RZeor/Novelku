@@ -8,6 +8,7 @@ import {
   UserResponse,
   NovelResponse,
   NovelListResponse,
+  UpdatedNovelResponse,
   GenreResponse,
   ChapterResponse,
   ChapterListResponse,
@@ -153,6 +154,11 @@ export const novelApi = {
       { method: 'GET' }
     );
   },
+
+  updates: (limit: number = 8) =>
+    apiFetch<UpdatedNovelResponse[]>(`/api/novels/updates?limit=${limit}`, {
+      method: 'GET',
+    }),
 
   get: (id: number) =>
     apiFetch<NovelResponse & { chapters: ChapterListResponse[] }>(`/api/novels/${id}`, {

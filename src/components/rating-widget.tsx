@@ -34,8 +34,11 @@ export default function RatingWidget({
     try {
       const res = await ratingApi.rate(novelId, value);
       setMessage(`Rating ${value} bintang berhasil disimpan!`);
-      // Update data di parent
-      onRatingUpdated(value, ratingCount + 1);
+      // Gunakan rata-rata & jumlah rating asli dari server
+      onRatingUpdated(
+        res.averageRating ?? value,
+        res.ratingCount ?? ratingCount
+      );
     } catch (err) {
       if (err instanceof ApiError) {
         setError(err.message);
