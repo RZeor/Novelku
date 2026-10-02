@@ -45,7 +45,7 @@ export default function HomePage() {
         const [latestRes, updatesRes, popularRes, genresRes] = await Promise.all([
           novelApi.list({ sortBy: 'createdAt', sortOrder: 'desc', limit: 8 }),
           novelApi.updates(8),
-          novelApi.list({ sortBy: 'viewCount', sortOrder: 'desc', limit: 4 }),
+          novelApi.list({ sortBy: 'viewCount', sortOrder: 'desc', limit: 6 }),
           genreApi.list(),
         ]);
 
@@ -167,7 +167,7 @@ export default function HomePage() {
               </Link>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-4 lg:grid-cols-5 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-6 gap-4">
               {recentHistory.map((item) => (
                 <div
                   key={item.id}
@@ -226,7 +226,7 @@ export default function HomePage() {
           </div>
 
           {isLoading ? (
-            <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-6">
               {[...Array(8)].map((_, i) => (
                 <div
                   key={i}
@@ -248,7 +248,7 @@ export default function HomePage() {
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-6">
               {latestNovels.map((novel) => (
                 <NovelCard key={novel.id} novel={novel} />
               ))}
@@ -275,7 +275,7 @@ export default function HomePage() {
               </Link>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-6">
               {popularNovels.map((novel) => (
                 <NovelCard key={novel.id} novel={novel} />
               ))}
@@ -302,7 +302,7 @@ export default function HomePage() {
               </Link>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-4 lg:grid-cols-5 xl:grid-cols-4 gap-4 sm:gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-6 xl:grid-cols-4 gap-4 sm:gap-6">
               {updatedNovels.map((novel) => (
                 <NovelUpdateCard key={novel.id} novel={novel} />
               ))}
