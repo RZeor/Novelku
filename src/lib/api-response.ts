@@ -54,6 +54,17 @@ export function conflictResponse(message: string = 'Conflict') {
   return errorResponse(message, 409);
 }
 
+export function tooManyRequestsResponse(
+  message: string = 'Terlalu banyak permintaan, coba lagi nanti',
+  retryAfterSeconds?: number
+) {
+  const response = errorResponse(message, 429);
+  if (retryAfterSeconds !== undefined) {
+    response.headers.set('Retry-After', String(retryAfterSeconds));
+  }
+  return response;
+}
+
 export function serverErrorResponse(message: string = 'Internal server error') {
   return errorResponse(message, 500);
 }

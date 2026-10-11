@@ -2,10 +2,12 @@ import { NextRequest } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { comparePassword, generateToken, setAuthCookie } from '@/lib/auth';
 import { loginSchema } from '@/lib/validations/auth';
+import { checkLoginRateLimit } from '@/lib/rate-limit';
 import {
   successResponse,
   errorResponse,
   unauthorizedResponse,
+  tooManyRequestsResponse,
   serverErrorResponse,
 } from '@/lib/api-response';
 
@@ -25,6 +27,19 @@ export async function POST(request: NextRequest) {
     }
 
     const { email, password } = parsed.data;
+
+    // Rate limit: cegah brute-force berdasarkan kombinasi IP + email
+    const rateLimit = await checkLoginRateLimit(request, email);
+    if (!rateLimit.success) {
+      const retryAfterSeconds = Math.max(
+        1,
+        Math.ceil((rateLimit.reset - Date.now()) / 1000)
+      );
+      return tooManyRequestsResponse(
+        'Terlalu banyak percobaan login. Silakan coba lagi nanti.',
+        retryAfterSeconds
+      );
+    }
 
     // Find user by email
     const user = await prisma.user.findUnique({

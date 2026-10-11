@@ -15,7 +15,7 @@ interface NovelUpdateCardProps {
  */
 export default function NovelUpdateCard({ novel }: NovelUpdateCardProps) {
   return (
-    <article className="flex flex-col gap-3 p-3 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200/70 dark:border-zinc-800 shadow-sm hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors">
+    <article className="flex flex-col gap-3 p-3 rounded-2xl border border-zinc-200/70 dark:border-zinc-800 shadow-sm hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors">
       {/* Cover → detail novel */}
       <Link
         href={`/novels/${novel.id}`}
