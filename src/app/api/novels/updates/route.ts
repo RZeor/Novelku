@@ -7,8 +7,8 @@ import { successResponse, serverErrorResponse } from '@/lib/api-response';
 // Mengambil novel yang BARU MENDAPAT UPDATE CHAPTER.
 //
 // Kriteria "update":
-//  - Novel sudah memiliki minimal 2 chapter (novel yang baru
-//    ditambahkan dengan 1 chapter pertama tidak dianggap update).
+//  - Novel sudah memiliki minimal 1 chapter (novel yang baru
+//    ditambahkan langsung tampil di daftar update).
 //  - Diurutkan berdasarkan tanggal rilis chapter terbaru.
 //
 // Catatan: tidak memakai novel.updatedAt karena kolom tersebut
@@ -23,17 +23,14 @@ export async function GET(request: NextRequest) {
       Math.max(1, parseInt(searchParams.get('limit') || '8', 10))
     );
 
-    // Hitung chapter terbaru & jumlah chapter per novel
+    // Hitung chapter terbaru per novel
     const grouped = await prisma.chapter.groupBy({
       by: ['novelId'],
       _max: { createdAt: true, chapterNumber: true },
-      _count: { _all: true },
       orderBy: { _max: { createdAt: 'desc' } },
     });
 
-    const updated = grouped
-      .filter((g) => g._count._all >= 2)
-      .slice(0, limit);
+    const updated = grouped.slice(0, limit);
 
     const novelIds = updated.map((g) => g.novelId);
 

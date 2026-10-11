@@ -285,7 +285,7 @@ function NovelsCatalogContent() {
 
         {/* Grid Novel / Skeletons / Empty State */}
         {isLoading ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 sm:gap-6">
             {[...Array(8)].map((_, i) => (
               <div
                 key={i}
@@ -318,7 +318,7 @@ function NovelsCatalogContent() {
             )}
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 sm:gap-6">
             {novels.map((novel) => (
               <NovelCard key={novel.id} novel={novel} />
             ))}

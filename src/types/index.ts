@@ -57,6 +57,22 @@ export interface NovelListResponse {
   createdAt: Date;
 }
 
+/** Novel unggulan untuk Hero Slider di halaman utama */
+export interface FeaturedNovelResponse {
+  id: number;
+  title: string;
+  slug: string;
+  description: string | null;
+  coverImage: string | null;
+  author: string;
+  status: NovelStatus;
+  totalChapters: number;
+  viewCount: number;
+  averageRating: number;
+  ratingCount: number;
+  genres: GenreResponse[];
+}
+
 /** Ringkasan chapter terbaru untuk kartu Novel Update */
 export interface NovelUpdateChapter {
   id: number;

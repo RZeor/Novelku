@@ -2,23 +2,22 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/auth-context';
 import { novelApi, genreApi, historyApi } from '@/lib/api-client';
 import {
   NovelListResponse,
   UpdatedNovelResponse,
+  FeaturedNovelResponse,
   GenreResponse,
   ReadingHistoryResponse,
 } from '@/types';
 import NovelCard from '@/components/novel-card';
 import NovelUpdateCard from '@/components/novel-update-card';
+import HeroCarousel from '@/components/hero-carousel';
 import { formatImageUrl } from '@/lib/utils';
 import {
   BookOpen,
-  Search,
   TrendingUp,
-  Sparkles,
   Layers,
   ArrowRight,
   Clock,
@@ -27,11 +26,9 @@ import {
 } from 'lucide-react';
 
 export default function HomePage() {
-  const router = useRouter();
   const { user } = useAuth();
 
-  const [searchQuery, setSearchQuery] = useState('');
-  const [latestNovels, setLatestNovels] = useState<NovelListResponse[]>([]);
+  const [featuredNovels, setFeaturedNovels] = useState<FeaturedNovelResponse[]>([]);
   const [updatedNovels, setUpdatedNovels] = useState<UpdatedNovelResponse[]>([]);
   const [popularNovels, setPopularNovels] = useState<NovelListResponse[]>([]);
   const [genres, setGenres] = useState<GenreResponse[]>([]);
@@ -42,14 +39,14 @@ export default function HomePage() {
     async function loadHomeData() {
       setIsLoading(true);
       try {
-        const [latestRes, updatesRes, popularRes, genresRes] = await Promise.all([
-          novelApi.list({ sortBy: 'createdAt', sortOrder: 'desc', limit: 8 }),
+        const [featuredRes, updatesRes, popularRes, genresRes] = await Promise.all([
+          novelApi.featured(5),
           novelApi.updates(8),
           novelApi.list({ sortBy: 'viewCount', sortOrder: 'desc', limit: 6 }),
           genreApi.list(),
         ]);
 
-        setLatestNovels(latestRes.items);
+        setFeaturedNovels(featuredRes);
         setUpdatedNovels(updatesRes);
         setPopularNovels(popularRes.items);
         setGenres(genresRes);
@@ -73,72 +70,54 @@ export default function HomePage() {
     loadHomeData();
   }, [user]);
 
-  const handleHeroSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      router.push(`/novels?search=${encodeURIComponent(searchQuery.trim())}`);
-    }
-  };
-
   return (
     <div className="flex-1 flex flex-col space-y-12 pb-16">
-      {/* 1. HERO SECTION */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-indigo-50/70 via-white to-transparent dark:from-indigo-950/20 dark:via-zinc-950 dark:to-transparent border-b border-zinc-100 dark:border-zinc-900 py-16 sm:py-24">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-100/80 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 text-xs font-semibold mb-6 border border-indigo-200/50 dark:border-indigo-800/50">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Pengalaman Membaca Novel Tanpa Gangguan</span>
-          </div>
-
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-50 leading-tight mb-4">
-            Temukan & Nikmati Kisah <br className="hidden sm:inline" />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-600 dark:from-indigo-400 dark:to-violet-400">
-              Favorit Anda di Novelku
-            </span>
-          </h1>
-
-          <p className="text-base sm:text-lg text-zinc-600 dark:text-zinc-400 max-w-2xl mx-auto mb-8 leading-relaxed">
-            Platform membaca novel pribadi dengan tampilan yang bersih, nyaman untuk mata, dan kemudahan mengatur pengalaman membaca Anda.
-          </p>
-
-          {/* Hero Search Bar */}
-          <form
-            onSubmit={handleHeroSearch}
-            className="max-w-xl mx-auto flex items-center bg-white dark:bg-zinc-900 rounded-2xl p-1.5 border border-zinc-200 dark:border-zinc-800 shadow-xl shadow-indigo-500/5"
-          >
-            <div className="pl-3.5 text-zinc-400">
-              <Search className="w-5 h-5" />
+      {/* 1. HERO SECTION — Auto-Sliding Carousel Novel Unggulan */}
+      {isLoading ? (
+        <section
+          aria-hidden="true"
+          className="relative overflow-hidden bg-zinc-950 border-b border-zinc-800/80"
+        >
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 lg:py-12">
+            <div className="grid grid-cols-1 md:grid-cols-[minmax(0,240px)_1fr] lg:grid-cols-[minmax(0,300px)_1fr] gap-6 lg:gap-10 items-center">
+              <div className="justify-self-center md:justify-self-start w-40 sm:w-48 md:w-full">
+                <div className="aspect-[3/4] w-full rounded-2xl bg-zinc-800/80 animate-pulse" />
+              </div>
+              <div className="space-y-4">
+                <div className="h-6 w-32 rounded-full bg-zinc-800/80 animate-pulse" />
+                <div className="h-8 w-3/4 rounded-lg bg-zinc-800/80 animate-pulse" />
+                <div className="h-4 w-1/3 rounded bg-zinc-800/60 animate-pulse" />
+                <div className="h-16 w-full max-w-2xl rounded bg-zinc-800/50 animate-pulse" />
+                <div className="h-10 w-40 rounded-xl bg-zinc-800/80 animate-pulse" />
+              </div>
             </div>
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Cari judul novel impian Anda..."
-              className="flex-1 px-3 py-2.5 bg-transparent text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 text-sm focus:outline-none"
-            />
-            <button
-              type="submit"
-              className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-sm transition-colors shadow-sm shadow-indigo-600/20"
-            >
-              Cari
-            </button>
-          </form>
-
-          {/* Quick Stats or Tags */}
-          <div className="mt-8 flex items-center justify-center gap-3 text-xs text-zinc-500 dark:text-zinc-400">
-            <span>Populer:</span>
-            {genres.slice(0, 4).map((g) => (
-              <Link
-                key={g.id}
-                href={`/novels?genre=${g.slug}`}
-                className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors underline-offset-4 hover:underline"
-              >
-                {g.name}
-              </Link>
-            ))}
           </div>
-        </div>
-      </section>
+        </section>
+      ) : featuredNovels.length > 0 ? (
+        <HeroCarousel novels={featuredNovels} />
+      ) : (
+        /* Fallback bila belum ada novel (tanpa menampilkan novel fiktif) */
+        <section className="relative overflow-hidden bg-gradient-to-b from-indigo-50/70 via-white to-transparent dark:from-indigo-950/20 dark:via-zinc-950 dark:to-transparent border-b border-zinc-100 dark:border-zinc-900 py-12 sm:py-16">
+          <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-indigo-100 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 mb-5">
+              <BookOpen className="w-7 h-7" />
+            </div>
+            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-50 mb-3">
+              Selamat Datang di Novelku
+            </h1>
+            <p className="text-base text-zinc-600 dark:text-zinc-400 max-w-xl mx-auto mb-6 leading-relaxed">
+              Belum ada novel yang dipublikasikan. Silakan jelajahi katalog atau kembali lagi nanti untuk menemukan kisah favorit Anda.
+            </p>
+            <Link
+              href="/novels"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold transition-colors shadow-lg shadow-indigo-600/20"
+            >
+              <span>Jelajahi Katalog</span>
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+        </section>
+      )}
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full space-y-14">
         {/* 2. SECTION LANJUTKAN MEMBACA (Khusus user login dengan riwayat) */}
@@ -207,56 +186,7 @@ export default function HomePage() {
           </section>
         )}
 
-        {/* 3. SECTION NOVEL TERBARU */}
-        <section>
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
-              <h2 className="text-xl sm:text-2xl font-bold text-zinc-900 dark:text-zinc-100">
-                Novel Terbaru
-              </h2>
-            </div>
-            <Link
-              href="/novels"
-              className="text-sm font-semibold text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1"
-            >
-              <span>Lihat Semua</span>
-              <ChevronRight className="w-4 h-4" />
-            </Link>
-          </div>
-
-          {isLoading ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-6">
-              {[...Array(8)].map((_, i) => (
-                <div
-                  key={i}
-                  className="animate-pulse bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 overflow-hidden"
-                >
-                  <div className="aspect-[3/4] bg-zinc-200 dark:bg-zinc-800" />
-                  <div className="p-4 space-y-2.5">
-                    <div className="h-4 bg-zinc-200 dark:bg-zinc-800 rounded w-3/4" />
-                    <div className="h-3 bg-zinc-200 dark:bg-zinc-800 rounded w-1/2" />
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : latestNovels.length === 0 ? (
-            <div className="text-center py-16 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800">
-              <BookOpen className="w-12 h-12 text-zinc-400 mx-auto mb-3" />
-              <p className="text-zinc-600 dark:text-zinc-400 font-medium">
-                Belum ada novel yang dipublikasikan.
-              </p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-6">
-              {latestNovels.map((novel) => (
-                <NovelCard key={novel.id} novel={novel} />
-              ))}
-            </div>
-          )}
-        </section>
-
-        {/* 4. SECTION NOVEL POPULER */}
+        {/* 3. SECTION NOVEL POPULER */}
         {popularNovels.length > 0 && (
           <section>
             <div className="flex items-center justify-between mb-6">
@@ -283,7 +213,7 @@ export default function HomePage() {
           </section>
         )}
 
-        {/* 5. SECTION NOVEL UPDATE (hanya novel yang baru dapat chapter baru) */}
+        {/* 4. SECTION NOVEL UPDATE (novel yang baru mendapat chapter baru) */}
         {updatedNovels.length > 0 && (
           <section>
             <div className="flex items-center justify-between mb-6">
@@ -302,7 +232,7 @@ export default function HomePage() {
               </Link>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-6 xl:grid-cols-4 gap-4 sm:gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-5 gap-4 sm:gap-6">
               {updatedNovels.map((novel) => (
                 <NovelUpdateCard key={novel.id} novel={novel} />
               ))}
@@ -310,7 +240,7 @@ export default function HomePage() {
           </section>
         )}
 
-        {/* 6. SECTION JELAJAH GENRE */}
+        {/* 5. SECTION JELAJAH GENRE */}
         {genres.length > 0 && (
           <section className="pt-6 border-t border-zinc-200/80 dark:border-zinc-800">
             <div className="flex items-center gap-2 mb-6">
