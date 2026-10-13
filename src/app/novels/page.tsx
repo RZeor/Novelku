@@ -129,7 +129,7 @@ function NovelsCatalogContent() {
     currentSortBy !== 'createdAt';
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 w-full flex-1">
+    <div className="w-full mx-auto px-6 lg:px-7 py-8 sm:py-12 flex-1">
       {/* Header Halaman */}
       <div className="mb-8">
         <div className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400 text-sm font-semibold mb-2">
@@ -285,7 +285,7 @@ function NovelsCatalogContent() {
 
         {/* Grid Novel / Skeletons / Empty State */}
         {isLoading ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 sm:gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 2xl:grid-cols-8 gap-4 sm:gap-6">
             {[...Array(8)].map((_, i) => (
               <div
                 key={i}
@@ -318,7 +318,7 @@ function NovelsCatalogContent() {
             )}
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 sm:gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 2xl:grid-cols-8 gap-4 sm:gap-6">
             {novels.map((novel) => (
               <NovelCard key={novel.id} novel={novel} />
             ))}

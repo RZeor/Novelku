@@ -7,6 +7,7 @@ import { useAuth } from '@/context/auth-context';
 import { chapterApi, historyApi, ApiError } from '@/lib/api-client';
 import { ChapterResponse, ChapterListResponse } from '@/types';
 import { formatImageUrl } from '@/lib/utils';
+import { useReadingTracker } from '@/hooks/use-reading-tracker';
 import {
   ArrowLeft,
   ChevronLeft,
@@ -53,6 +54,13 @@ export default function ReaderPage({ params }: ReaderPageProps) {
   // UI state
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isChapterDrawerOpen, setIsChapterDrawerOpen] = useState(false);
+
+  // Pelacakan aktivitas membaca aktif (hanya aktif jika user login)
+  useReadingTracker({
+    novelId: chapter?.novelId ?? 0,
+    chapterId: chapter?.id ?? 0,
+    enabled: Boolean(user && chapter && !isLoading),
+  });
 
   // 1. Muat preferensi tampilan dari localStorage
   useEffect(() => {

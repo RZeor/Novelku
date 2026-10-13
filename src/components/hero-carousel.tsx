@@ -180,7 +180,7 @@ export default function HeroCarousel({ novels }: HeroCarouselProps) {
         }}
       />
 
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 lg:py-12">
+      <div className="relative w-full mx-auto px-6 lg:px-7 py-8 sm:py-10 lg:py-12">
         <div className="grid grid-cols-1 md:grid-cols-[minmax(0,240px)_1fr] lg:grid-cols-[minmax(0,300px)_1fr] gap-6 lg:gap-10 items-center">
           {/* ================= COVER ================= */}
           <div className="justify-self-center md:justify-self-start w-40 sm:w-48 md:w-full">

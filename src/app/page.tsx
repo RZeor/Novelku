@@ -78,7 +78,7 @@ export default function HomePage() {
           aria-hidden="true"
           className="relative overflow-hidden bg-zinc-950 border-b border-zinc-800/80"
         >
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 lg:py-12">
+          <div className="w-full mx-auto px-6 lg:px-7 py-8 sm:py-10 lg:py-12">
             <div className="grid grid-cols-1 md:grid-cols-[minmax(0,240px)_1fr] lg:grid-cols-[minmax(0,300px)_1fr] gap-6 lg:gap-10 items-center">
               <div className="justify-self-center md:justify-self-start w-40 sm:w-48 md:w-full">
                 <div className="aspect-[3/4] w-full rounded-2xl bg-zinc-800/80 animate-pulse" />
@@ -119,7 +119,7 @@ export default function HomePage() {
         </section>
       )}
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full space-y-14">
+      <div className="w-full mx-auto px-6 lg:px-7 space-y-14">
         {/* 2. SECTION LANJUTKAN MEMBACA (Khusus user login dengan riwayat) */}
         {user && recentHistory.length > 0 && (
           <section className="bg-indigo-50/50 dark:bg-indigo-950/20 rounded-3xl p-6 sm:p-8 border border-indigo-100 dark:border-indigo-900/50">
@@ -146,7 +146,7 @@ export default function HomePage() {
               </Link>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-6 2xl:grid-cols-8 gap-4">
               {recentHistory.map((item) => (
                 <div
                   key={item.id}
@@ -205,7 +205,7 @@ export default function HomePage() {
               </Link>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 2xl:grid-cols-8 gap-4 sm:gap-6">
               {popularNovels.map((novel) => (
                 <NovelCard key={novel.id} novel={novel} />
               ))}
@@ -232,7 +232,7 @@ export default function HomePage() {
               </Link>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-5 gap-4 sm:gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-5 2xl:grid-cols-6 gap-4 sm:gap-6">
               {updatedNovels.map((novel) => (
                 <NovelUpdateCard key={novel.id} novel={novel} />
               ))}

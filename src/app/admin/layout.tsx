@@ -17,6 +17,7 @@ import {
   X,
   Loader2,
   Lock,
+  TrendingUp,
 } from 'lucide-react';
 
 interface AdminLayoutProps {
@@ -79,6 +80,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
   const navItems = [
     { name: 'Dashboard', href: '/admin', icon: LayoutDashboard, exact: true },
+    { name: 'Statistik Pembaca', href: '/admin/analytics', icon: TrendingUp },
     { name: 'Kelola Novel', href: '/admin/novels', icon: BookOpen },
     { name: 'Kelola Genre', href: '/admin/genres', icon: Layers },
     { name: 'Kelola Pengguna', href: '/admin/users', icon: Users },

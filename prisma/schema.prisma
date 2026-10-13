@@ -46,6 +46,7 @@ model User {
   ratings          Rating[]
   bookmarks        Bookmark[]
   readingHistories ReadingHistory[]
+  readingSessions  ReadingSession[]
 
   @@map("users")
 }
@@ -77,6 +78,7 @@ model Novel {
   ratings          Rating[]
   bookmarks        Bookmark[]
   readingHistories ReadingHistory[]
+  readingSessions  ReadingSession[]
 
   @@index([status])
   @@index([createdAt])
@@ -133,6 +135,7 @@ model Chapter {
   // Relations
   novel            Novel            @relation(fields: [novelId], references: [id], onDelete: Cascade)
   readingHistories ReadingHistory[]
+  readingSessions  ReadingSession[]
 
   @@unique([novelId, chapterNumber])
   @@index([novelId])
@@ -234,4 +237,32 @@ model ReadingHistory {
   @@unique([userId, chapterId])
   @@index([userId, novelId])
   @@map("reading_histories")
+}
+
+// ============================================================
+// READING SESSIONS (Analytics Pembaca Terautentikasi)
+// ============================================================
+
+model ReadingSession {
+  id              Int       @id @default(autoincrement())
+  sessionId       String    @unique @map("session_id") @db.VarChar(64)
+  userId          Int       @map("user_id")
+  novelId         Int       @map("novel_id")
+  chapterId       Int       @map("chapter_id")
+  startTime       DateTime  @default(now()) @map("start_time")
+  lastHeartbeat   DateTime  @default(now()) @map("last_heartbeat")
+  durationSeconds Int       @default(0) @map("duration_seconds")
+  isCompleted     Boolean   @default(false) @map("is_completed")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  novel   Novel   @relation(fields: [novelId], references: [id], onDelete: Cascade)
+  chapter Chapter @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+
+  @@index([startTime])
+  @@index([novelId, startTime])
+  @@index([userId, startTime])
+  @@map("reading_sessions")
 }

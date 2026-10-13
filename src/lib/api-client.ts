@@ -19,6 +19,7 @@ import {
   ReadingHistoryResponse,
   PaginatedResponse,
   DashboardStats,
+  AnalyticsResponse,
 } from '@/types';
 
 // ============================================================
@@ -263,6 +264,18 @@ export const chapterApi = {
     apiFetch<{ message: string }>(`/api/chapters/${id}`, {
       method: 'DELETE',
     }),
+
+  createBatch: (
+    novelId: number,
+    chapters: Array<{ chapterNumber: number; title: string; content: string }>
+  ) =>
+    apiFetch<{ message: string; createdCount: number }>(
+      `/api/novels/${novelId}/chapters/batch`,
+      {
+        method: 'POST',
+        body: JSON.stringify({ chapters }),
+      }
+    ),
 };
 
 // ============================================================
@@ -423,4 +436,49 @@ export const adminApi = {
     apiFetch<{ message: string }>(`/api/admin/comments/${id}`, {
       method: 'DELETE',
     }),
+
+  analytics: (params: {
+    period?: '7d' | '30d' | 'custom';
+    startDate?: string;
+    endDate?: string;
+    novelId?: number;
+    sortBy?: 'activities' | 'uniqueReaders';
+  } = {}) => {
+    const query = new URLSearchParams();
+    if (params.period) query.set('period', params.period);
+    if (params.startDate) query.set('startDate', params.startDate);
+    if (params.endDate) query.set('endDate', params.endDate);
+    if (params.novelId) query.set('novelId', params.novelId.toString());
+    if (params.sortBy) query.set('sortBy', params.sortBy);
+    const queryString = query.toString();
+
+    return apiFetch<AnalyticsResponse>(
+      `/api/admin/analytics${queryString ? `?${queryString}` : ''}`,
+      { method: 'GET' }
+    );
+  },
+};
+
+// ============================================================
+// 11. READER ANALYTICS API (Client-side tracking)
+// ============================================================
+
+export const analyticsApi = {
+  startRead: (data: { sessionId: string; novelId: number; chapterId: number }) =>
+    apiFetch<{ tracked: boolean; session?: unknown; reused?: boolean }>(
+      '/api/analytics/read-start',
+      {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }
+    ),
+
+  heartbeat: (sessionId: string) =>
+    apiFetch<{ credited: number; totalDuration: number; isCompleted: boolean }>(
+      '/api/analytics/heartbeat',
+      {
+        method: 'POST',
+        body: JSON.stringify({ sessionId }),
+      }
+    ),
 };

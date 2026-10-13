@@ -95,7 +95,7 @@ function BookmarksContent() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 w-full flex-1">
+    <div className="w-full mx-auto px-6 lg:px-7 py-8 sm:py-12 flex-1">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div>

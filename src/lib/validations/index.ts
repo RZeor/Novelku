@@ -4,3 +4,4 @@ export * from './genre';
 export * from './chapter';
 export * from './comment';
 export * from './rating';
+export * from './analytics';

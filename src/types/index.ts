@@ -217,3 +217,42 @@ export interface DashboardStats {
   totalComments: number;
   totalRatings: number;
 }
+
+// ============================================================
+// READER ANALYTICS (Admin Dashboard)
+// ============================================================
+
+export interface AnalyticsSummary {
+  totalActivities: number;
+  uniqueReaders: number;
+  totalDurationSeconds: number;
+  averageDurationPerSession: number;
+  averageDurationPerReader: number;
+  activeSessionsCount: number;
+}
+
+export interface DailyTrendItem {
+  date: string; // YYYY-MM-DD
+  activities: number;
+  uniqueReaders: number;
+}
+
+export interface PopularNovelAnalytics {
+  novelId: number;
+  title: string;
+  slug: string;
+  coverImage: string | null;
+  activities: number;
+  uniqueReaders: number;
+  totalDurationSeconds: number;
+}
+
+export interface AnalyticsResponse {
+  period: '7d' | '30d' | 'custom';
+  startDate: string;
+  endDate: string;
+  novelFilter: number | null;
+  summary: AnalyticsSummary;
+  dailyTrends: DailyTrendItem[];
+  popularNovels: PopularNovelAnalytics[];
+}
