@@ -108,7 +108,7 @@ export const authApi = {
       body: JSON.stringify(body),
     }),
 
-  login: (body: { email: string; password: string }) =>
+  login: (body: { email: string; password: string; rememberMe?: boolean }) =>
     apiFetch<{ user: UserResponse; message: string }>('/api/auth/login', {
       method: 'POST',
       body: JSON.stringify(body),

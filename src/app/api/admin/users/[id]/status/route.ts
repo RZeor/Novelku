@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { requireAdmin } from '@/lib/auth-guard';
+import { requireAdmin, updateAdminActivity } from '@/lib/auth-guard';
 import {
   successResponse,
   errorResponse,
@@ -54,6 +54,9 @@ export async function PATCH(request: NextRequest, { params }: Params) {
     });
 
     const statusText = parsed.data.isActive ? 'diaktifkan' : 'dinonaktifkan';
+
+    // Update admin activity on successful mutation
+    await updateAdminActivity(admin!.id);
 
     return successResponse({
       ...updatedUser,

@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { requireAdmin } from '@/lib/auth-guard';
+import { requireAdmin, updateAdminActivity } from '@/lib/auth-guard';
 import { updateNovelSchema } from '@/lib/validations/novel';
 import { generateSlug } from '@/lib/utils';
 import {
@@ -161,6 +161,9 @@ export async function PUT(request: NextRequest, { params }: Params) {
       genres: novel.genres.map((ng) => ng.genre),
     };
 
+    // Update admin activity on successful mutation
+    await updateAdminActivity(user!.id);
+
     return successResponse(formattedNovel);
   } catch (error) {
     console.error('Update novel error:', error);
@@ -182,6 +185,9 @@ export async function DELETE(_request: NextRequest, { params }: Params) {
     if (!existing) return notFoundResponse('Novel tidak ditemukan');
 
     await prisma.novel.delete({ where: { id: novelId } });
+
+    // Update admin activity on successful mutation
+    await updateAdminActivity(user!.id);
 
     return successResponse({ message: 'Novel berhasil dihapus' });
   } catch (error) {

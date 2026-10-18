@@ -23,6 +23,10 @@ export const loginSchema = z.object({
   password: z
     .string()
     .min(1, 'Password wajib diisi'),
+  rememberMe: z
+    .boolean()
+    .optional()
+    .default(false),
 });
 
 export type RegisterInput = z.infer<typeof registerSchema>;

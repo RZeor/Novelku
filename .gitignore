@@ -41,6 +41,8 @@ yarn-error.log*
 next-env.d.ts
 /prisma/seed.ts
 /src/generated/prisma
+AUDIT_SESSION_TIMEOUT.md
+IMPLEMENTATION_REPORT.md
 
 # editor / AI tooling
 .agents/

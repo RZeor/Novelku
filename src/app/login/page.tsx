@@ -17,6 +17,7 @@ function LoginForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -42,7 +43,7 @@ function LoginForm() {
 
     setIsSubmitting(true);
     try {
-      await login({ email: email.trim(), password });
+      await login({ email: email.trim(), password, rememberMe });
       // Redirect ditangani oleh useEffect di atas setelah user state terisi
     } catch (err) {
       if (err instanceof ApiError) {
@@ -142,6 +143,23 @@ function LoginForm() {
                   {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
               </div>
+            </div>
+
+            {/* Remember Me Checkbox */}
+            <div className="flex items-center gap-2">
+              <input
+                id="rememberMe"
+                type="checkbox"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+                className="w-4 h-4 rounded border-zinc-300 dark:border-zinc-600 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
+              />
+              <label
+                htmlFor="rememberMe"
+                className="text-sm text-zinc-600 dark:text-zinc-400 cursor-pointer"
+              >
+                Ingat saya selama 30 hari
+              </label>
             </div>
 
             {/* Submit Button */}

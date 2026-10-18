@@ -63,9 +63,13 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // Generate JWT and set cookie
-    const token = generateToken({ userId: user.id, role: user.role });
-    await setAuthCookie(token);
+    // Generate JWT with default 24-hour expiry (no Remember Me on registration)
+    const token = generateToken({ userId: user.id, role: user.role }, false);
+    
+    // New user gets session cookie (no Remember Me by default)
+    await setAuthCookie(token, {
+      isSessionCookie: true,
+    });
 
     return createdResponse({
       user,

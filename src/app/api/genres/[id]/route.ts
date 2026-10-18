@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { requireAdmin } from '@/lib/auth-guard';
+import { requireAdmin, updateAdminActivity } from '@/lib/auth-guard';
 import { updateGenreSchema } from '@/lib/validations/genre';
 import { generateSlug } from '@/lib/utils';
 import {
@@ -50,6 +50,9 @@ export async function PUT(request: NextRequest, { params }: Params) {
       select: { id: true, name: true, slug: true },
     });
 
+    // Update admin activity on successful mutation
+    await updateAdminActivity(user!.id);
+
     return successResponse(genre);
   } catch (error) {
     console.error('Update genre error:', error);
@@ -71,6 +74,9 @@ export async function DELETE(_request: NextRequest, { params }: Params) {
     if (!existing) return notFoundResponse('Genre tidak ditemukan');
 
     await prisma.genre.delete({ where: { id: genreId } });
+
+    // Update admin activity on successful mutation
+    await updateAdminActivity(user!.id);
 
     return successResponse({ message: 'Genre berhasil dihapus' });
   } catch (error) {

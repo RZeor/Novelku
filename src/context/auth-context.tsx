@@ -13,7 +13,7 @@ import { authApi, ApiError } from '@/lib/api-client';
 interface AuthContextType {
   user: UserResponse | null;
   isLoading: boolean;
-  login: (credentials: { email: string; password: string }) => Promise<void>;
+  login: (credentials: { email: string; password: string; rememberMe?: boolean }) => Promise<void>;
   register: (credentials: { username: string; email: string; password: string }) => Promise<void>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
@@ -41,7 +41,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     refreshUser();
   }, [refreshUser]);
 
-  const login = async (credentials: { email: string; password: string }) => {
+  const login = async (credentials: { email: string; password: string; rememberMe?: boolean }) => {
     setIsLoading(true);
     try {
       const response = await authApi.login(credentials);

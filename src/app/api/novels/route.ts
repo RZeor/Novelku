@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { requireAdmin } from '@/lib/auth-guard';
+import { requireAdmin, updateAdminActivity } from '@/lib/auth-guard';
 import { createNovelSchema } from '@/lib/validations/novel';
 import { generateSlug, parsePagination, buildPaginationMeta } from '@/lib/utils';
 import {
@@ -167,6 +167,9 @@ export async function POST(request: NextRequest) {
       ...novel,
       genres: novel.genres.map((ng) => ng.genre),
     };
+
+    // Update admin activity on successful mutation
+    await updateAdminActivity(user!.id);
 
     return createdResponse(formattedNovel);
   } catch (error) {

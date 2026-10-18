@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { requireAdmin } from '@/lib/auth-guard';
+import { requireAdmin, updateAdminActivity } from '@/lib/auth-guard';
 import { createGenreSchema } from '@/lib/validations/genre';
 import { generateSlug } from '@/lib/utils';
 import {
@@ -57,6 +57,9 @@ export async function POST(request: NextRequest) {
       data: { name, slug },
       select: { id: true, name: true, slug: true },
     });
+
+    // Update admin activity on successful mutation
+    await updateAdminActivity(user!.id);
 
     return createdResponse(genre);
   } catch (error) {

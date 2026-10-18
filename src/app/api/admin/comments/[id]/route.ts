@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { requireAdmin } from '@/lib/auth-guard';
+import { requireAdmin, updateAdminActivity } from '@/lib/auth-guard';
 import {
   successResponse,
   errorResponse,
@@ -24,6 +24,9 @@ export async function DELETE(_request: NextRequest, { params }: Params) {
     if (!comment) return notFoundResponse('Komentar tidak ditemukan');
 
     await prisma.comment.delete({ where: { id: commentId } });
+
+    // Update admin activity on successful mutation
+    await updateAdminActivity(user!.id);
 
     return successResponse({ message: 'Komentar berhasil dihapus' });
   } catch (error) {
