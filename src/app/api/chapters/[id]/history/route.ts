@@ -26,15 +26,15 @@ export async function POST(_request: NextRequest, { params }: Params) {
     });
     if (!chapter) return notFoundResponse('Chapter tidak ditemukan');
 
-    // Upsert reading history
     const history = await prisma.readingHistory.upsert({
       where: {
-        userId_chapterId: {
+        userId_novelId: {
           userId: user!.id,
-          chapterId,
+          novelId: chapter.novelId,
         },
       },
       update: {
+        chapterId,
         lastReadAt: new Date(),
       },
       create: {

@@ -234,8 +234,7 @@ model ReadingHistory {
   novel   Novel   @relation(fields: [novelId], references: [id], onDelete: Cascade)
   chapter Chapter @relation(fields: [chapterId], references: [id], onDelete: Cascade)
 
-  @@unique([userId, chapterId])
-  @@index([userId, novelId])
+  @@unique([userId, novelId])
   @@map("reading_histories")
 }
 
