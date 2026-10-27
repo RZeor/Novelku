@@ -44,6 +44,7 @@ next-env.d.ts
 AUDIT_SESSION_TIMEOUT.md
 IMPLEMENTATION_REPORT.md
 prisma\migrations
+documentation
 
 # editor / AI tooling
 .agents/

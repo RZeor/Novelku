@@ -16,7 +16,6 @@ import {
   Menu,
   X,
   Loader2,
-  Lock,
   TrendingUp,
 } from 'lucide-react';
 
@@ -30,45 +29,11 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   const { user, isLoading, logout } = useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  // 1. Loading State
   if (isLoading) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-zinc-50 dark:bg-zinc-950">
         <Loader2 className="w-8 h-8 animate-spin text-indigo-600 mb-3" />
         <p className="text-sm text-zinc-500 font-medium">Memeriksa hak akses admin...</p>
-      </div>
-    );
-  }
-
-  // 2. Proteksi Akses (Forbidden jika bukan Admin)
-  if (!user || user.role !== 'ADMIN') {
-    return (
-      <div className="min-h-screen flex items-center justify-center px-4 bg-zinc-50 dark:bg-zinc-950">
-        <div className="max-w-md w-full bg-white dark:bg-zinc-900 rounded-3xl p-8 border border-zinc-200 dark:border-zinc-800 shadow-xl text-center">
-          <div className="w-16 h-16 rounded-2xl bg-red-50 dark:bg-red-950/50 text-red-600 dark:text-red-400 flex items-center justify-center mx-auto mb-4 border border-red-200 dark:border-red-900/50">
-            <Lock className="w-8 h-8" />
-          </div>
-          <h1 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
-            Akses Ditolak (403 Forbidden)
-          </h1>
-          <p className="text-sm text-zinc-600 dark:text-zinc-400 mt-2 mb-6">
-            Halaman ini hanya dapat diakses oleh administrator sistem. Silakan masuk menggunakan akun dengan hak akses admin.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link
-              href="/login?redirect=/admin"
-              className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold transition-colors shadow-sm"
-            >
-              Masuk sebagai Admin
-            </Link>
-            <Link
-              href="/"
-              className="px-5 py-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-sm font-semibold transition-colors"
-            >
-              Kembali ke Beranda
-            </Link>
-          </div>
-        </div>
       </div>
     );
   }
@@ -145,7 +110,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             className="w-full flex items-center gap-2.5 px-3.5 py-2 rounded-xl text-xs font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors text-left"
           >
             <LogOut className="w-4 h-4" />
-            <span>Keluar ({user.username})</span>
+            <span>Keluar ({user?.username})</span>
           </button>
         </div>
       </aside>

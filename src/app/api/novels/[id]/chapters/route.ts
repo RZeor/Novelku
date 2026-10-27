@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { requireAdmin } from '@/lib/auth-guard';
 import { createChapterSchema } from '@/lib/validations/chapter';
 import { countWords } from '@/lib/utils';
+import { sanitizeChapterContent } from '@/lib/sanitize';
 import {
   successResponse,
   createdResponse,
@@ -103,6 +104,8 @@ export async function POST(request: NextRequest, { params }: Params) {
     if (!content || content.trim().length === 0) {
       return errorResponse('Konten chapter wajib diisi', 400);
     }
+
+    content = sanitizeChapterContent(content.trim());
 
     // Check duplicate chapter number
     const existingChapter = await prisma.chapter.findUnique({

@@ -3,7 +3,7 @@ import { Ratelimit } from '@upstash/ratelimit';
 import { Redis } from '@upstash/redis';
 
 // ============================================================
-// Rate Limiting (Upstash Redis)
+// Rate Limiting (Upstash Redis with In-Memory Fallback)
 // ------------------------------------------------------------
 // Sliding window limiter berbasis kombinasi IP + identifier
 // (mis. email) untuk mencegah brute-force pada endpoint auth.
@@ -12,8 +12,8 @@ import { Redis } from '@upstash/redis';
 //   UPSTASH_REDIS_REST_URL
 //   UPSTASH_REDIS_REST_TOKEN
 //
-// Jika env belum diisi, rate limiting di-skip (fail-open) agar
-// aplikasi tetap berjalan tanpa konfigurasi Upstash.
+// Fail-secure: jika env belum diisi atau Redis error, gunakan
+// in-memory limiter sebagai fallback untuk tetap melindungi dari brute-force.
 // ============================================================
 
 const UPSTASH_URL = process.env.UPSTASH_REDIS_REST_URL;
@@ -44,6 +44,44 @@ export const loginRateLimit = redis
       analytics: false,
     })
   : null;
+
+/**
+ * In-memory rate limit limiter sebagai fallback ketika Redis tidak tersedia.
+ * Menyimpan timestamps request per key dengan sliding window 60 detik.
+ * Max 5 requests per window sesuai dengan loginRateLimit config.
+ */
+const memoryLimitCache = new Map<string, number[]>();
+const MEMORY_LIMIT_MAX_REQUESTS = 5;
+const MEMORY_LIMIT_WINDOW_MS = 60 * 1000;
+const MEMORY_LIMIT_CLEANUP_INTERVAL = 5 * 60 * 1000;
+
+function checkMemoryRateLimit(key: string): boolean {
+  const now = Date.now();
+  let timestamps = memoryLimitCache.get(key) || [];
+
+  timestamps = timestamps.filter((t) => now - t < MEMORY_LIMIT_WINDOW_MS);
+
+  if (timestamps.length >= MEMORY_LIMIT_MAX_REQUESTS) {
+    memoryLimitCache.set(key, timestamps);
+    return false;
+  }
+
+  timestamps.push(now);
+  memoryLimitCache.set(key, timestamps);
+  return true;
+}
+
+setInterval(() => {
+  const now = Date.now();
+  for (const [key, timestamps] of memoryLimitCache.entries()) {
+    const active = timestamps.filter((t) => now - t < MEMORY_LIMIT_WINDOW_MS);
+    if (active.length === 0) {
+      memoryLimitCache.delete(key);
+    } else {
+      memoryLimitCache.set(key, active);
+    }
+  }
+}, MEMORY_LIMIT_CLEANUP_INTERVAL);
 
 /**
  * Ambil alamat IP pengirim request dari header proxy.
@@ -89,41 +127,49 @@ const ALLOW: RateLimitResult = {
  * Hasil yang paling ketat (paling cepat reset / sisa paling kecil)
  * dikembalikan.
  *
- * Fail-open: jika Upstash tidak dikonfigurasi atau terjadi error
- * jaringan, request diizinkan agar tidak mengunci user karena
- * masalah infrastruktur.
+ * Fail-secure: jika Upstash tidak dikonfigurasi atau terjadi error,
+ * gunakan in-memory fallback limiter untuk tetap melindungi dari brute-force.
  */
 export async function checkLoginRateLimit(
   request: NextRequest,
   identifier: string
 ): Promise<RateLimitResult> {
-  if (!loginRateLimit) return ALLOW;
-
   const ip = getClientIp(request);
   const normalizedIdentifier = identifier.trim().toLowerCase();
 
-  try {
-    const [byIp, byIdentifier] = await Promise.all([
-      loginRateLimit.limit(`ip:${ip}`),
-      loginRateLimit.limit(`id:${normalizedIdentifier}`),
-    ]);
+  if (loginRateLimit) {
+    try {
+      const [byIp, byIdentifier] = await Promise.all([
+        loginRateLimit.limit(`ip:${ip}`),
+        loginRateLimit.limit(`id:${normalizedIdentifier}`),
+      ]);
 
-    const results = [byIp, byIdentifier];
+      const results = [byIp, byIdentifier];
 
-    // Jika salah satu gagal, tolak dan pilih hasil paling ketat.
-    const success = results.every((r) => r.success);
-    const strictest = results.reduce((acc, r) =>
-      r.remaining < acc.remaining ? r : acc
-    );
+      const success = results.every((r) => r.success);
+      const strictest = results.reduce((acc, r) =>
+        r.remaining < acc.remaining ? r : acc
+      );
 
-    return {
-      success,
-      remaining: strictest.remaining,
-      reset: Math.max(...results.map((r) => r.reset)),
-      limit: strictest.limit,
-    };
-  } catch (error) {
-    console.error('Rate limit check error:', error);
-    return ALLOW;
+      return {
+        success,
+        remaining: strictest.remaining,
+        reset: Math.max(...results.map((r) => r.reset)),
+        limit: strictest.limit,
+      };
+    } catch (error) {
+      console.error('Redis rate limit check failed, falling back to in-memory limiter:', error);
+    }
   }
+
+  const ipAllowed = checkMemoryRateLimit(`ip:${ip}`);
+  const idAllowed = checkMemoryRateLimit(`id:${normalizedIdentifier}`);
+  const success = ipAllowed && idAllowed;
+
+  return {
+    success,
+    remaining: success ? MEMORY_LIMIT_MAX_REQUESTS - 1 : 0,
+    reset: Date.now() + MEMORY_LIMIT_WINDOW_MS,
+    limit: MEMORY_LIMIT_MAX_REQUESTS,
+  };
 }

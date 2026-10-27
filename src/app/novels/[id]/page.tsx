@@ -4,8 +4,8 @@ import React, { useEffect, useState, use } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/auth-context';
-import { novelApi, bookmarkApi, likeApi, ApiError } from '@/lib/api-client';
-import { NovelResponse, ChapterListResponse } from '@/types';
+import { novelApi, bookmarkApi, likeApi, historyApi, ApiError } from '@/lib/api-client';
+import { NovelResponse, ChapterListResponse, NovelReadingProgress } from '@/types';
 import RatingWidget from '@/components/rating-widget';
 import CommentSection from '@/components/comment-section';
 import { formatImageUrl } from '@/lib/utils';
@@ -46,6 +46,9 @@ export default function NovelDetailPage({ params }: NovelDetailProps) {
   const [chapterSearch, setChapterSearch] = useState('');
   const [isActionLoading, setIsActionLoading] = useState(false);
 
+  // Reading progress state
+  const [readingProgress, setReadingProgress] = useState<NovelReadingProgress | null>(null);
+
   useEffect(() => {
     async function loadNovelData() {
       if (isNaN(novelId)) {
@@ -68,8 +71,12 @@ export default function NovelDetailPage({ params }: NovelDetailProps) {
             const bookmarksRes = await bookmarkApi.list({ limit: 100 });
             const bookmarked = bookmarksRes.items.some((b) => b.novelId === novelId);
             setIsBookmarked(bookmarked);
+
+            // Ambil progress membaca untuk novel ini
+            const progressRes = await historyApi.getByNovel(novelId);
+            setReadingProgress(progressRes.progress);
           } catch {
-            // Abaikan error bookmark check
+            // Abaikan error bookmark/history check
           }
         }
       } catch (err) {
@@ -179,6 +186,16 @@ export default function NovelDetailPage({ params }: NovelDetailProps) {
 
   const firstChapter = novel.chapters.length > 0 ? novel.chapters[0] : null;
 
+  // Tentukan chapter tujuan tombol utama:
+  // Gunakan progres riwayat hanya jika chapter tersebut masih ada di novel ini.
+  const resumeChapter =
+    readingProgress && novel.chapters.some((ch) => ch.id === readingProgress.chapterId)
+      ? readingProgress
+      : null;
+
+  const primaryChapterId = resumeChapter?.chapterId ?? firstChapter?.id ?? null;
+  const primaryChapterNumber = resumeChapter?.chapterNumber ?? firstChapter?.chapterNumber ?? null;
+
   const statusLabel =
     novel.status === 'COMPLETED' ? 'Tamat' : novel.status === 'HIATUS' ? 'Hiatus' : 'Berjalan (Ongoing)';
 
@@ -287,13 +304,17 @@ export default function NovelDetailPage({ params }: NovelDetailProps) {
 
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-3 pt-4 border-t border-zinc-100 dark:border-zinc-800">
-              {firstChapter ? (
+              {primaryChapterId ? (
                 <Link
-                  href={`/chapters/${firstChapter.id}`}
+                  href={`/chapters/${primaryChapterId}`}
                   className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold shadow-md shadow-indigo-600/20 transition-colors"
                 >
                   <BookOpen className="w-4 h-4" />
-                  <span>Mulai Baca (Chapter 1)</span>
+                  <span>
+                    {resumeChapter
+                      ? `Lanjutkan Membaca (Chapter ${primaryChapterNumber})`
+                      : `Mulai Baca (Chapter ${primaryChapterNumber})`}
+                  </span>
                 </Link>
               ) : (
                 <button

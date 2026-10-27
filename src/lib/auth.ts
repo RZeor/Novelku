@@ -3,7 +3,14 @@ import jwt from 'jsonwebtoken';
 import { cookies } from 'next/headers';
 import { prisma } from './prisma';
 
-const JWT_SECRET = process.env.JWT_SECRET!;
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) {
+  throw new Error(
+    'JWT_SECRET environment variable is required. ' +
+    'Set it in .env before starting the application.'
+  );
+}
+const JWT_SECRET_CONST: string = JWT_SECRET;
 const SALT_ROUNDS = 12;
 
 // Session timeout constants (in milliseconds)
@@ -66,7 +73,7 @@ export function generateToken(
       rememberMe: rememberMe || false,
       issuedAt,
     },
-    JWT_SECRET,
+    JWT_SECRET_CONST,
     {
       expiresIn,
     }
@@ -75,7 +82,7 @@ export function generateToken(
 
 export function verifyToken(token: string): JwtPayload | null {
   try {
-    return jwt.verify(token, JWT_SECRET) as JwtPayload;
+    return jwt.verify(token, JWT_SECRET_CONST) as JwtPayload;
   } catch {
     return null;
   }
@@ -111,7 +118,7 @@ function buildCookieOptions(options: CookieOptions = {}) {
   
   const baseOptions = {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
+    secure: true,
     sameSite: 'lax' as const,
     path: '/',
   };

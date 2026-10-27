@@ -187,6 +187,14 @@ export interface ReadingHistoryResponse {
   };
 }
 
+/** Progres baca terakhir user pada satu novel (untuk tombol Lanjutkan Membaca) */
+export interface NovelReadingProgress {
+  chapterId: number;
+  chapterNumber: number;
+  chapterTitle: string;
+  lastReadAt: Date;
+}
+
 // ============================================================
 // Pagination Types
 // ============================================================

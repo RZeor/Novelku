@@ -17,6 +17,7 @@ import {
   RatingResponse,
   BookmarkResponse,
   ReadingHistoryResponse,
+  NovelReadingProgress,
   PaginatedResponse,
   DashboardStats,
   AnalyticsResponse,
@@ -379,6 +380,12 @@ export const historyApi = {
       { method: 'GET' }
     );
   },
+
+  getByNovel: (novelId: number) =>
+    apiFetch<{ progress: NovelReadingProgress | null }>(
+      `/api/novels/${novelId}/reading-progress`,
+      { method: 'GET' }
+    ),
 
   record: (chapterId: number) =>
     apiFetch<ReadingHistoryResponse>(`/api/chapters/${chapterId}/history`, {

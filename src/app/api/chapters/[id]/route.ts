@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { requireAdmin } from '@/lib/auth-guard';
 import { updateChapterSchema } from '@/lib/validations/chapter';
 import { countWords } from '@/lib/utils';
+import { sanitizeChapterContent } from '@/lib/sanitize';
 import {
   successResponse,
   errorResponse,
@@ -84,7 +85,8 @@ export async function PUT(request: NextRequest, { params }: Params) {
         if (!file.name.endsWith('.txt')) return errorResponse('Hanya file .txt yang diperbolehkan', 400);
         const MAX_FILE_SIZE = 5 * 1024 * 1024;
         if (file.size > MAX_FILE_SIZE) return errorResponse('Ukuran file maksimal 5MB', 400);
-        const content = await file.text();
+        let content = await file.text();
+        content = sanitizeChapterContent(content.trim());
         updateData.content = content;
         updateData.wordCount = countWords(content);
       }
@@ -97,8 +99,10 @@ export async function PUT(request: NextRequest, { params }: Params) {
       if (parsed.data.chapterNumber !== undefined) updateData.chapterNumber = parsed.data.chapterNumber;
       if (parsed.data.title !== undefined) updateData.title = parsed.data.title;
       if (parsed.data.content !== undefined) {
-        updateData.content = parsed.data.content;
-        updateData.wordCount = countWords(parsed.data.content);
+        let content = parsed.data.content.trim();
+        content = sanitizeChapterContent(content);
+        updateData.content = content;
+        updateData.wordCount = countWords(content);
       }
     }
 
