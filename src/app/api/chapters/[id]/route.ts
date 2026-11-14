@@ -70,7 +70,7 @@ export async function PUT(request: NextRequest, { params }: Params) {
     if (!existing) return notFoundResponse('Chapter tidak ditemukan');
 
     const contentType = request.headers.get('content-type') || '';
-    let updateData: Record<string, unknown> = {};
+    const updateData: Record<string, unknown> = {};
 
     if (contentType.includes('multipart/form-data')) {
       const formData = await request.formData();

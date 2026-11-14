@@ -1,8 +1,9 @@
-import DOMPurify from 'isomorphic-dompurify';
+import sanitizeHtml from 'sanitize-html';
 
 export function sanitizeChapterContent(content: string): string {
-  return DOMPurify.sanitize(content, { 
-    ALLOWED_TAGS: [],
-    ALLOWED_ATTR: [],
+  return sanitizeHtml(content, {
+    allowedTags: [],
+    allowedAttributes: {},
+    disallowedTagsMode: 'discard',
   });
 }
